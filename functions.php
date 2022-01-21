@@ -1,6 +1,6 @@
 <?php
 
-function task1($num)
+function task1GetUsersJSON($num) : string | false
 {
     $responce = '';
 
@@ -14,27 +14,25 @@ function task1($num)
         ];
     }
 
-    file_put_contents('users.json', json_encode($users));
+    return json_encode($users);
+}
 
-    //---------------------------------------
+function task1CountUsersByNameFromJSON($json) : array
+{
+    $users = json_decode($json);
 
-    $json = file_get_contents('users.json');
-    $receivedUsers = json_decode($json);
+    return array_reduce($users, function ($carry, $user){
+        $carry[$user->name] = ($carry[$user->name] || 0) + 1;
+    }, []);
+}
 
-    $usersOfName = [];
-    $sum = 0;
-    foreach ($receivedUsers as $user) {
-        $usersOfName[$user->name] = ($usersOfName[$user->name] || 0) + 1;
-        $sum += $user->age;
-    }
-    $averageAge = $sum / count($receivedUsers);
+function task1GetAverageAgeFromJSON($json)
+{
+    $users = json_decode($json);
 
-    echo '<pre>';
-    print_r("Average age is $averageAge");
-    echo "\n";
-    print_r($usersOfName);
-    echo "------------------------------------------------------------------------------\n";
-    print_r($receivedUsers);
-    echo "===============================================================================\n";
-    echo '</pre>';
+    $averageAge = array_reduce($users, function ($carry, $user){
+        $carry += $user->Age;
+    }, 0) / count($users); // Должен признать на JavaScript'е этот подход выглядит лучше.
+
+    return $averageAge;
 }
